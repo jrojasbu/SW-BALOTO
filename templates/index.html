@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicador Loto Colombia</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-globes">
+        <div class="globe g1"></div>
+        <div class="globe g2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-gem"></i> LotoPredictor <span class="badge">PRO</span></h1>
+            <p>Generador de Probabilidades para Baloto y MiLoto</p>
+        </header>
+
+        <section class="controls-section">
+            <button id="fetchBtn" class="btn primary-btn pulse"><i class="fas fa-sync-alt"></i> Actualizar Datos (Internet)</button>
+            <button id="manualBtn" class="btn secondary-btn"><i class="fas fa-edit"></i> Ingreso Manual</button>
+        </section>
+
+        <div id="statusMsg" class="status-message"></div>
+
+        <main class="dashboard-grid">
+            <!-- Baloto Card -->
+            <div class="card baloto-card">
+                <div class="card-header">
+                    <h2>Baloto</h2>
+                    <span class="tag">Acumulado</span>
+                </div>
+                <div class="card-body">
+                    <p>Genera tu combinación basada en los más frecuentes.</p>
+                    <div class="result-display" id="balotoResult">
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="super-ball placeholder">?</span>
+                    </div>
+                    <button class="btn action-btn" onclick="generatePrediction('baloto')">Generar Baloto</button>
+                </div>
+            </div>
+
+            <!-- MiLoto Card -->
+            <div class="card miloto-card">
+                <div class="card-header">
+                    <h2>MiLoto</h2>
+                    <span class="tag">Diario</span>
+                </div>
+                <div class="card-body">
+                    <p>5 números calientes del último mes.</p>
+                    <div class="result-display" id="milotoResult">
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                        <span class="ball placeholder">?</span>
+                    </div>
+                    <button class="btn action-btn" onclick="generatePrediction('miloto')">Generar MiLoto</button>
+                </div>
+            </div>
+        </main>
+
+        <section class="stats-section">
+            <h3>estadísticas Rápidas</h3>
+            <div id="statsContainer" class="stats-grid">
+                <p class="text-muted">Carga datos para ver estadísticas...</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Manual Input Modal -->
+    <div id="manualModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Agregar Sorteo Manual</h2>
+            <form id="manualForm">
+                <label>Tipo:</label>
+                <select id="manualType" name="type">
+                    <option value="baloto">Baloto</option>
+                    <option value="miloto">MiLoto</option>
+                </select>
+
+                <label>Fecha:</label>
+                <input type="date" id="manualDate" required>
+
+                <label>Números (separados por coma):</label>
+                <input type="text" id="manualNumbers" placeholder="Ej: 5, 12, 23, 34, 40" required>
+
+                <div id="superInputGroup">
+                    <label>Super Balota:</label>
+                    <input type="number" id="manualSuper" min="1" max="16">
+                </div>
+
+                <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 20px;">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
