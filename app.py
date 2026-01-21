@@ -76,5 +76,150 @@ def get_stats():
         'miloto': logic.calculate_frequencies([r for r in stored_results if r['type'] == 'miloto'])
     })
 
+
+# ============================================
+# PREDICTIVE ANALYTICS ENDPOINTS
+# ============================================
+
+@app.route('/api/predictive/<game_type>', methods=['GET'])
+def get_predictive_data(game_type):
+    """
+    Returns comprehensive predictive analytics data for charts.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({
+            'status': 'error',
+            'message': f'No data found for {game_type}. Please fetch data first.'
+        }), 400
+    
+    data = logic.get_comprehensive_prediction_data(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/hot-cold', methods=['GET'])
+def get_hot_cold(game_type):
+    """
+    Returns hot and cold numbers analysis.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_hot_cold_numbers(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/gaps', methods=['GET'])
+def get_gaps(game_type):
+    """
+    Returns number gaps (overdue numbers) analysis.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_number_gaps(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/trends', methods=['GET'])
+def get_trends(game_type):
+    """
+    Returns trend analysis data.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_trend_analysis(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/pairs', methods=['GET'])
+def get_pairs(game_type):
+    """
+    Returns pair frequency analysis.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_pair_frequency(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/sum-distribution', methods=['GET'])
+def get_sum_distribution(game_type):
+    """
+    Returns sum distribution analysis.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_sum_distribution(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/predictive/<game_type>/positions', methods=['GET'])
+def get_positions(game_type):
+    """
+    Returns position analysis data.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    
+    if not history:
+        return jsonify({'status': 'error', 'message': 'No data found'}), 400
+    
+    data = logic.calculate_position_analysis(history, game_type)
+    return jsonify({'status': 'success', 'data': data})
+
+
+@app.route('/api/history/<game_type>', methods=['GET'])
+def get_history(game_type):
+    """
+    Returns historical draw data for a game type.
+    """
+    if game_type not in ['baloto', 'miloto']:
+        return jsonify({'status': 'error', 'message': 'Invalid game type'}), 400
+    
+    history = [r for r in stored_results if r['type'] == game_type]
+    sorted_history = sorted(history, key=lambda x: x.get('date', ''), reverse=True)
+    
+    return jsonify({
+        'status': 'success',
+        'data': sorted_history,
+        'count': len(sorted_history)
+    })
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='127.0.0.2')

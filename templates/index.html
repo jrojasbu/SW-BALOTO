@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 </head>
 <body>
     <div class="background-globes">
@@ -23,6 +26,13 @@
             <p>Generador de Probabilidades para Baloto y MiLoto</p>
         </header>
 
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <button class="tab-btn active" data-tab="generator"><i class="fas fa-dice"></i> Generador</button>
+            <button class="tab-btn" data-tab="predictive"><i class="fas fa-chart-line"></i> Gráficos Predictivos</button>
+            <button class="tab-btn" data-tab="history"><i class="fas fa-history"></i> Historial</button>
+        </nav>
+
         <section class="controls-section">
             <button id="fetchBtn" class="btn primary-btn pulse"><i class="fas fa-sync-alt"></i> Actualizar Datos (Internet)</button>
             <button id="manualBtn" class="btn secondary-btn"><i class="fas fa-edit"></i> Ingreso Manual</button>
@@ -30,53 +40,202 @@
 
         <div id="statusMsg" class="status-message"></div>
 
-        <main class="dashboard-grid">
-            <!-- Baloto Card -->
-            <div class="card baloto-card">
-                <div class="card-header">
-                    <h2>Baloto</h2>
-                    <span class="tag">Acumulado</span>
-                </div>
-                <div class="card-body">
-                    <p>Genera tu combinación basada en los más frecuentes.</p>
-                    <div class="result-display" id="balotoResult">
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="super-ball placeholder">?</span>
+        <!-- Tab Content: Generator -->
+        <div id="tab-generator" class="tab-content active">
+            <main class="dashboard-grid">
+                <!-- Baloto Card -->
+                <div class="card baloto-card">
+                    <div class="card-header">
+                        <h2>Baloto</h2>
+                        <span class="tag">Acumulado</span>
                     </div>
-                    <button class="btn action-btn" onclick="generatePrediction('baloto')">Generar Baloto</button>
+                    <div class="card-body">
+                        <p>Genera tu combinación basada en los más frecuentes.</p>
+                        <div class="result-display" id="balotoResult">
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="super-ball placeholder">?</span>
+                        </div>
+                        <button class="btn action-btn" onclick="generatePrediction('baloto')">Generar Baloto</button>
+                    </div>
                 </div>
+
+                <!-- MiLoto Card -->
+                <div class="card miloto-card">
+                    <div class="card-header">
+                        <h2>MiLoto</h2>
+                        <span class="tag">Diario</span>
+                    </div>
+                    <div class="card-body">
+                        <p>5 números calientes del último mes.</p>
+                        <div class="result-display" id="milotoResult">
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                            <span class="ball placeholder">?</span>
+                        </div>
+                        <button class="btn action-btn" onclick="generatePrediction('miloto')">Generar MiLoto</button>
+                    </div>
+                </div>
+            </main>
+
+            <section class="stats-section">
+                <h3>Estadísticas Rápidas</h3>
+                <div id="statsContainer" class="stats-grid">
+                    <p class="text-muted">Carga datos para ver estadísticas...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab Content: Predictive Graphics -->
+        <div id="tab-predictive" class="tab-content">
+            <!-- Game Type Selector -->
+            <div class="game-selector">
+                <button class="game-btn active" data-game="baloto"><i class="fas fa-star"></i> Baloto</button>
+                <button class="game-btn" data-game="miloto"><i class="fas fa-coins"></i> MiLoto</button>
             </div>
 
-            <!-- MiLoto Card -->
-            <div class="card miloto-card">
-                <div class="card-header">
-                    <h2>MiLoto</h2>
-                    <span class="tag">Diario</span>
-                </div>
-                <div class="card-body">
-                    <p>5 números calientes del último mes.</p>
-                    <div class="result-display" id="milotoResult">
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
-                        <span class="ball placeholder">?</span>
+            <!-- Charts Grid -->
+            <div class="charts-container">
+                <!-- Frequency Chart -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> Frecuencia de Números</h3>
+                        <span class="chart-info">Cantidad de veces que ha salido cada número</span>
                     </div>
-                    <button class="btn action-btn" onclick="generatePrediction('miloto')">Generar MiLoto</button>
+                    <div class="chart-body">
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hot & Cold Numbers -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-fire"></i> Números Calientes vs Fríos</h3>
+                        <span class="chart-info">Números más y menos frecuentes</span>
+                    </div>
+                    <div class="chart-body">
+                        <div class="hot-cold-container">
+                            <div class="hot-numbers">
+                                <h4><i class="fas fa-fire-alt"></i> Calientes</h4>
+                                <div id="hotNumbersList" class="number-list"></div>
+                            </div>
+                            <div class="cold-numbers">
+                                <h4><i class="fas fa-snowflake"></i> Fríos</h4>
+                                <div id="coldNumbersList" class="number-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gaps Analysis -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-clock"></i> Números Atrasados</h3>
+                        <span class="chart-info">Sorteos desde última aparición</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="gapsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Trend Analysis -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-arrow-trend-up"></i> Tendencias</h3>
+                        <span class="chart-info">Números en alza vs en baja</span>
+                    </div>
+                    <div class="chart-body">
+                        <div class="trends-container">
+                            <div class="trending-up">
+                                <h4><i class="fas fa-arrow-up"></i> En Alza</h4>
+                                <div id="trendingUpList" class="trend-list"></div>
+                            </div>
+                            <div class="trending-down">
+                                <h4><i class="fas fa-arrow-down"></i> En Baja</h4>
+                                <div id="trendingDownList" class="trend-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sum Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-calculator"></i> Distribución de Sumas</h3>
+                        <span class="chart-info">Rango típico de suma total</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="sumChart"></canvas>
+                        <div id="sumStats" class="sum-stats"></div>
+                    </div>
+                </div>
+
+                <!-- Pair Frequency -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-link"></i> Parejas Frecuentes</h3>
+                        <span class="chart-info">Números que salen juntos</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="pairsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Position Analysis -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-sort-numeric-down"></i> Análisis por Posición</h3>
+                        <span class="chart-info">Números más frecuentes en cada posición (ordenados)</span>
+                    </div>
+                    <div class="chart-body">
+                        <div id="positionAnalysis" class="position-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Super Balota Analysis (Baloto only) -->
+                <div class="chart-card baloto-only" id="superBalotaCard">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-gem"></i> Super Balota</h3>
+                        <span class="chart-info">Análisis del número extra</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="superChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Prediction Summary -->
+                <div class="chart-card prediction-summary">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-magic"></i> Resumen Predictivo</h3>
+                        <span class="chart-info">Recomendaciones basadas en análisis</span>
+                    </div>
+                    <div class="chart-body">
+                        <div id="predictionSummary" class="prediction-content">
+                            <p class="text-muted">Carga datos para ver recomendaciones...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
 
-        <section class="stats-section">
-            <h3>estadísticas Rápidas</h3>
-            <div id="statsContainer" class="stats-grid">
-                <p class="text-muted">Carga datos para ver estadísticas...</p>
+        <!-- Tab Content: History -->
+        <div id="tab-history" class="tab-content">
+            <div class="history-controls">
+                <select id="historyGameSelect" class="history-select">
+                    <option value="baloto">Baloto</option>
+                    <option value="miloto">MiLoto</option>
+                </select>
+                <button id="loadHistoryBtn" class="btn secondary-btn"><i class="fas fa-search"></i> Cargar Historial</button>
             </div>
-        </section>
+            <div id="historyContainer" class="history-table-container">
+                <p class="text-muted">Selecciona un juego y carga el historial...</p>
+            </div>
+        </div>
     </div>
 
     <!-- Manual Input Modal -->
