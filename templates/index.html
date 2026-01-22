@@ -3,7 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predicador Loto Colombia</title>
+    <meta name="description" content="Generador de predicciones para Baloto y MiLoto en Colombia. Analiza frecuencias, tendencias y genera combinaciones probabilísticas basadas en datos históricos.">
+    <meta name="keywords" content="baloto, miloto, loteria colombia, predicciones loteria, generador baloto, predictor miloto, frecuencias loteria">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SW BALOTO">
+    <meta name="language" content="Spanish">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url_for('index', _external=True) }}">
+    <meta property="og:title" content="Predictor Loto Colombia - Generador de Predicciones Baloto y MiLoto">
+    <meta property="og:description" content="Generador de predicciones para Baloto y MiLoto en Colombia. Analiza frecuencias, tendencias y genera combinaciones probabilísticas basadas en datos históricos.">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url_for('index', _external=True) }}">
+    <meta property="twitter:title" content="Predictor Loto Colombia - Generador de Predicciones Baloto y MiLoto">
+    <meta property="twitter:description" content="Generador de predicciones para Baloto y MiLoto en Colombia. Analiza frecuencias, tendencias y genera combinaciones probabilísticas basadas en datos históricos.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <title>Predictor Loto Colombia - Generador de Predicciones Baloto y MiLoto</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
@@ -13,6 +33,34 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Predictor Loto Colombia",
+        "description": "Generador de predicciones para Baloto y MiLoto en Colombia. Analiza frecuencias, tendencias y genera combinaciones probabilísticas basadas en datos históricos.",
+        "url": "{{ url_for('index', _external=True) }}",
+        "applicationCategory": "Utility",
+        "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Organization",
+            "name": "SW BALOTO"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "COP"
+        },
+        "featureList": [
+            "Generador de combinaciones Baloto",
+            "Generador de combinaciones MiLoto",
+            "Análisis de frecuencias",
+            "Gráficos predictivos",
+            "Historial de sorteos"
+        ]
+    }
+    </script>
 </head>
 <body>
     <div class="background-globes">
@@ -22,7 +70,7 @@
 
     <div class="container">
         <header>
-            <h1><i class="fas fa-gem"></i> LotoPredictor <span class="badge">PRO</span></h1>
+            <h1><i class="fas fa-gem"></i> Predictor Loto Colombia <span class="badge">PRO</span></h1>
             <p>Generador de Probabilidades para Baloto y MiLoto</p>
         </header>
 
